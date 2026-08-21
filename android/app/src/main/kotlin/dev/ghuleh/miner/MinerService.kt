@@ -179,6 +179,25 @@ class MinerService : Service() {
                 try { Thread.sleep(2500) } catch (_: InterruptedException) {}
                 RootBooster.boostToTopApp()
             }.apply { isDaemon = true }.start()
+
+            // 24h hashrate history sampler. Runs for the life of this mining
+            // session (service, not activity — so backgrounding/closing the
+            // app doesn't create a gap) and feeds HashrateHistory, which the
+            // dashboard's "24H AVG" tile reads. Stops itself once `stopping`
+            // is set or this process is no longer the live one (a fresh
+            // launchMiner() replaced it).
+            Thread {
+                val intervalMs = HashrateHistory.SAMPLE_INTERVAL_SEC * 1000
+                while (!stopping && process === proc) {
+                    try { Thread.sleep(intervalMs) } catch (_: InterruptedException) { break }
+                    if (stopping || process !== proc) break
+                    val khs = ApiClient.summary()?.get("KHS")?.toDoubleOrNull()
+                    if (khs != null) {
+                        HashrateHistory.recordSample(
+                            this@MinerService, khs, HashrateHistory.SAMPLE_INTERVAL_SEC)
+                    }
+                }
+            }.apply { isDaemon = true }.start()
         } catch (e: Exception) {
             Log.e(TAG, "failed to launch miner", e)
             exitNote = "failed to launch miner"
@@ -325,7 +344,7 @@ class MinerService : Service() {
             // overwriting a held lock's reference would leak it until reboot.
             if (wakeLock?.isHeld == true) return
             val pm = getSystemService(Context.POWER_SERVICE) as PowerManager
-            wakeLock = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "primo:miner").apply {
+            wakeLock = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "ghuleh:miner").apply {
                 acquire()
             }
         }

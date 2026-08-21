@@ -13,5 +13,5 @@
     <color name="danger">#FF5566</color>
     <color name="log_ok">#3FB950</color> <!-- the site terminal's "Accepted" green -->
     <color name="chip_idle">#2A2E3A</color>
-    <color name="icon_bg">#0D1015</color>
+    <color name="icon_bg">#120A21</color>
 </resources>

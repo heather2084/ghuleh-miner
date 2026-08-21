@@ -151,6 +151,11 @@
                 </LinearLayout>
 
                 <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_columnWeight="1" android:layout_margin="4dp" android:orientation="vertical" android:background="@drawable/stat_tile" android:padding="12dp">
+                    <TextView android:id="@+id/val24hAvg" style="@style/StatValue" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="0.00 MH/s" />
+                    <TextView style="@style/StatLabel" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="24H AVG" />
+                </LinearLayout>
+
+                <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_columnWeight="1" android:layout_margin="4dp" android:orientation="vertical" android:background="@drawable/stat_tile" android:padding="12dp">
                     <TextView android:id="@+id/valTemp" style="@style/StatValue" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="—" />
                     <TextView android:id="@+id/lblTemp" style="@style/StatLabel" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="TEMPERATURE" />
                 </LinearLayout>

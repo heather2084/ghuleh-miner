@@ -80,7 +80,10 @@ class MiningActivity : Activity() {
                 // "pool" tells us the LIVE pool — matters with failover, where
                 // the miner may have switched away from the primary.
                 val p = ApiClient.query("pool")
-                runOnUiThread { render(s, t, hw, p) }
+                // Independent of mining state — a wall-clock 24h average, read
+                // off MinerService's own background sampler (see HashrateHistory).
+                val avg24h = HashrateHistory.average24hKhs(this@MiningActivity)
+                runOnUiThread { render(s, t, hw, p, avg24h) }
             }
             handler.postDelayed(this, 2000)
         }
@@ -250,8 +253,11 @@ class MiningActivity : Activity() {
     private fun render(
         s: Map<String, String>?, t: List<Map<String, String>>?,
         hw: Map<String, String>?, livePool: Map<String, String>?,
+        avg24hKhs: Double,
     ) {
         renderBattery()
+        // Historical, not live — keep it updating regardless of mining state.
+        setVal(R.id.val24hAvg, fmtRate(avg24hKhs))
         // Trust the SERVICE state, not API reachability: a crashed miner must
         // read as "exited", and one last successful poll right after Stop must
         // not flip the pill back to mining. Grace window: startForegroundService
