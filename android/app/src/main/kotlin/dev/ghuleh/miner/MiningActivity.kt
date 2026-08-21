@@ -46,12 +46,12 @@ class MiningActivity : Activity() {
     private lateinit var threadWrap: LinearLayout
     private lateinit var startStop: Button
 
-    private val IDLE = Color.parseColor("#2A2E3A")
-    private val DARK = Color.parseColor("#0B0C10")
+    private val IDLE = Color.parseColor("#362A52")
+    private val DARK = Color.parseColor("#120A21")
     private val WARN = Color.parseColor("#FFB020")
     private val DANGER = Color.parseColor("#FF5566")
-    private val DIM = Color.parseColor("#828A9A")
-    private val TEXT = Color.parseColor("#F2F4F8")
+    private val DIM = Color.parseColor("#9789B8")
+    private val TEXT = Color.parseColor("#F1EEFA")
 
     /** Live accent = the active algorithm's coin color (Palette). Everything
      *  accent-tinted is re-applied through applyAccent() when it changes. */

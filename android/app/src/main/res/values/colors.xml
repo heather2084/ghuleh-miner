@@ -1,17 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="bg">#0B0C10</color>
-    <color name="bar">#121319</color>
-    <color name="card">#1A1C24</color>
-    <color name="field">#14161D</color>
-    <color name="stroke">#262A36</color>
-    <color name="accent">#2FC6B5</color>
-    <color name="accent_dim">#102E2B</color>
+    <color name="bg">#120A21</color> <!-- deep purple-black, matches the app icon -->
+    <color name="bar">#1C1235</color>
+    <color name="card">#211735</color>
+    <color name="field">#170E29</color>
+    <color name="stroke">#3D2F63</color>
+    <color name="accent">#2FD6C4</color> <!-- teal, matches the ghost icon's eyes -->
+    <color name="accent_dim">#172F3E</color>
     <color name="warn">#FFB020</color>
-    <color name="text">#F2F4F8</color>
-    <color name="textdim">#828A9A</color>
+    <color name="text">#F1EEFA</color>
+    <color name="textdim">#9789B8</color>
     <color name="danger">#FF5566</color>
     <color name="log_ok">#3FB950</color> <!-- the site terminal's "Accepted" green -->
-    <color name="chip_idle">#2A2E3A</color>
+    <color name="chip_idle">#362A52</color>
     <color name="icon_bg">#120A21</color>
 </resources>

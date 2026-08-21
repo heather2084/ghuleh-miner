@@ -131,7 +131,7 @@
             android:background="@drawable/pill_bg"
             android:backgroundTint="@color/accent"
             android:text="@string/save"
-            android:textColor="#0B0C10"
+            android:textColor="#120A21"
             android:textSize="16sp"
             android:textStyle="bold" />
     </LinearLayout>

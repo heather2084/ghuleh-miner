@@ -11,8 +11,8 @@ import android.graphics.drawable.GradientDrawable
  * tints through here, so switching algorithms re-skins the whole app.
  */
 object Palette {
-    private const val BG = 0xFF0B0C10.toInt()          // window background
-    val TEAL = 0xFF2FC6B5.toInt()                      // app brand (site teal) / unknown algo
+    private const val BG = 0xFF120A21.toInt()          // window background
+    val TEAL = 0xFF2FD6C4.toInt()                      // app brand (site teal) / unknown algo
 
     fun accentFor(algo: String?): Int = when (algo?.trim()?.lowercase()) {
         "verus" -> 0xFF5B8DEF.toInt()                  // Verus blue (#3165D4 lifted)

@@ -165,9 +165,12 @@
                     <TextView style="@style/StatLabel" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="BATTERY" />
                 </LinearLayout>
 
-                <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_columnWeight="1" android:layout_margin="4dp" android:orientation="vertical" android:background="@drawable/stat_tile" android:padding="12dp">
-                    <TextView android:id="@+id/valCharge" style="@style/StatValue" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="—" />
-                    <TextView style="@style/StatLabel" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="CHARGE STATUS" />
+                <!-- Odd tile out (9 total in a 2-col grid) -- span both columns and
+                     center it instead of leaving it stranded in the left column
+                     with a blank cell beside it. -->
+                <LinearLayout android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_columnSpan="2" android:layout_gravity="center_horizontal" android:layout_margin="4dp" android:orientation="vertical" android:background="@drawable/stat_tile" android:padding="12dp">
+                    <TextView android:id="@+id/valCharge" style="@style/StatValue" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_gravity="center_horizontal" android:text="—" />
+                    <TextView style="@style/StatLabel" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_gravity="center_horizontal" android:text="CHARGE STATUS" />
                 </LinearLayout>
             </GridLayout>
         </LinearLayout>
@@ -181,7 +184,7 @@
         android:layout_margin="18dp"
         android:background="@drawable/pill_bg"
         android:text="@string/start"
-        android:textColor="#0B0C10"
+        android:textColor="#120A21"
         android:textSize="17sp"
         android:textStyle="bold" />
 </LinearLayout>
