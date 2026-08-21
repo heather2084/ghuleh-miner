@@ -1,4 +1,9 @@
-# Primo ARM Miner — Android APK (Milestone 1)
+# Ghuleh Miner — Android APK (Milestone 1)
+
+(Fork of primo-arm-miner. Historical entries below predate the fork and
+describe upstream's own build/release process — kept for context, not
+all still literally true here. Command output paths have been corrected
+to match this fork's actual `build_apk_termux.sh`.)
 
 A thin Android wrapper around the existing native miner. **No miner rewrite** —
 the same C++ binary runs as a foreground-service subprocess, and the UI just
@@ -47,7 +52,7 @@ bash android/build_native_termux.sh
 
 # 3. build + sign the APK
 cd android && bash build_apk_termux.sh
-# -> android/build/primo-arm-miner.apk  (debug-signed)
+# -> android/build/ghuleh-miner.apk  (debug-signed)
 ```
 
 ### Alternative: the same build in docker (arm64 Linux host)
@@ -91,7 +96,7 @@ only place to *validate* mining performance. Container-specific gotchas:
   1.1.1.1/8.8.8.8 directly over plain sockets — which DO work in the
   sandbox — and retries via `CURLOPT_RESOLVE`.
 
-Install: `adb install -r android/build/primo-arm-miner.apk`, or copy to the
+Install: `adb install -r android/build/ghuleh-miner.apk`, or copy to the
 phone and tap it (enable "install unknown apps").
 
 ## Pool configuration notes
@@ -282,8 +287,8 @@ Takes effect the next time mining starts.
       IPv6 (`[addr]:port`) only when that's all a host offers.
 - [x] Release signing keystore — DONE 2026-07-06: `build_apk_termux.sh`
       release-signs when `PRIMO_KEYSTORE` (path to the release `.jks`) +
-      `PRIMO_KS_PASS` (+ optional `PRIMO_KS_ALIAS`, default `primolab`) are
-      set → `build/primo-arm-miner-release.apk`, printing the cert SHA-256
+      `PRIMO_KS_PASS` (+ optional `PRIMO_KS_ALIAS`, default `ghuleh`) are
+      set → `build/ghuleh-miner-release.apk`, printing the cert SHA-256
       fingerprint (publish it with releases). Unset = debug keystore,
       unchanged. The keystore lives OUTSIDE all repos (backed up privately);
       the SAME key must sign every release forever — a changed key forces

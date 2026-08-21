@@ -1,6 +1,6 @@
 #!/data/data/com.termux/files/usr/bin/bash
 #
-# Build the Primo ARM Miner APK *on an Android phone in Termux* (aarch64-native),
+# Build the Ghuleh Miner APK *on an Android phone in Termux* (aarch64-native),
 # bypassing Gradle/AGP entirely with the raw aapt2 -> kotlinc -> d8 -> apksigner
 # pipeline. AGP in Termux is painful (it pulls x86 aapt2/d8 + wants a full SDK);
 # this uses Termux's native tools directly.
@@ -19,11 +19,11 @@
 #      from a public platforms mirror into ~/.primo-android-sdk/ (override with
 #      ANDROID_JAR=/path/to/android.jar).
 #
-# Output: build/primo-arm-miner.apk (debug-signed; install with `adb install` or tap).
+# Output: build/ghuleh-miner.apk (debug-signed; install with `adb install` or tap).
 set -euo pipefail
 
 API=33
-PKG=dev.primolab.miner
+PKG=dev.ghuleh.miner
 HERE=$(cd "$(dirname "$0")" && pwd)
 APP="$HERE/app/src/main"
 OUT="$HERE/build"
@@ -136,7 +136,7 @@ cp "$ROOT/LICENSES/Apache-2.0.txt"        "$OUT/assets/licenses/Apache-2.0.txt"
 # --- 5. align + sign ---------------------------------------------------------
 # Release signing: set PRIMO_KEYSTORE (path to the RELEASE .jks) and
 # PRIMO_KS_PASS (store+key password); optional PRIMO_KS_ALIAS (default
-# "primolab"). The release key is the app's identity — updates only install
+# "ghuleh"). The release key is the app's identity — updates only install
 # over an APK signed with the SAME key. Never regenerate it; keep off-device
 # backups. Unset = debug keystore, auto-generated, exactly as before.
 if [ -n "${PRIMO_KEYSTORE:-}" ]; then
@@ -144,19 +144,19 @@ if [ -n "${PRIMO_KEYSTORE:-}" ]; then
   [ -n "${PRIMO_KS_PASS:-}" ] || die "PRIMO_KS_PASS not set (release keystore password)"
   KEYSTORE="$PRIMO_KEYSTORE"
   KS_PASS="$PRIMO_KS_PASS"
-  KS_ALIAS="${PRIMO_KS_ALIAS:-primolab}"
-  SIGNED_NAME="primo-arm-miner-release.apk"
+  KS_ALIAS="${PRIMO_KS_ALIAS:-ghuleh}"
+  SIGNED_NAME="ghuleh-miner-release.apk"
   say "RELEASE signing with $KEYSTORE (alias $KS_ALIAS)"
 else
   KEYSTORE="$SDK_CACHE/debug.keystore"
   KS_PASS="android"
   KS_ALIAS="androiddebugkey"
-  SIGNED_NAME="primo-arm-miner.apk"
+  SIGNED_NAME="ghuleh-miner.apk"
   if [ ! -f "$KEYSTORE" ]; then
     say "generating debug keystore"
     keytool -genkeypair -keystore "$KEYSTORE" -storepass android -keypass android \
       -alias androiddebugkey -keyalg RSA -keysize 2048 -validity 10000 \
-      -dname "CN=Primo Debug,O=PrimoLab,C=US"
+      -dname "CN=Ghuleh Debug,O=Ghuleh Miner,C=US"
   fi
 fi
 

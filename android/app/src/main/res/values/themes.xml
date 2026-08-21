@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <style name="PrimoDark" parent="@android:style/Theme.Material">
+    <style name="GhulehDark" parent="@android:style/Theme.Material">
         <item name="android:windowBackground">@color/bg</item>
         <item name="android:colorBackground">@color/bg</item>
         <item name="android:colorPrimary">@color/bar</item>
@@ -8,13 +8,13 @@
         <item name="android:colorAccent">@color/accent</item>
         <item name="android:textColorPrimary">@color/text</item>
         <item name="android:textColorSecondary">@color/textdim</item>
-        <item name="android:alertDialogTheme">@style/PrimoDialog</item>
+        <item name="android:alertDialogTheme">@style/GhulehDialog</item>
     </style>
 
     <!-- The ⓘ help popups. Stock AlertDialog otherwise inherits the device's
          default (light on OneUI/Samsung) dialog theme and clashes with the
          dark app; this pins it to the app palette. Framework-only, no lib. -->
-    <style name="PrimoDialog" parent="@android:style/Theme.Material.Dialog.Alert">
+    <style name="GhulehDialog" parent="@android:style/Theme.Material.Dialog.Alert">
         <item name="android:windowBackground">@drawable/dialog_bg</item>
         <item name="android:colorBackground">@color/card</item>
         <item name="android:textColorPrimary">@color/text</item>

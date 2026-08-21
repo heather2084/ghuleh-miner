@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Primo ARM Miner</string>
+    <string name="app_name">Ghuleh Miner</string>
     <string name="config_title">Configuration</string>
     <string name="logs_title">Miner log</string>
     <string name="start">Start mining</string>
@@ -10,7 +10,7 @@
     <string name="notif_channel">Mining</string>
     <string name="status_idle">Idle — not mining</string>
     <string name="disclaimer_title">Before you mine</string>
-    <string name="disclaimer_text" formatted="false">This app is a cryptocurrency CPU miner. Mining runs your processor at full load for as long as it is active: the device will get hot, draw a lot of power, drain the battery quickly, and sustained mining may accelerate battery and hardware wear.\n\nDev fee: to support development, the miner periodically mines to the developer\'s wallet for a small slice of time — 2% for Verus and 1% for the other algorithms. Everything else goes to the pool and wallet you configure.\n\nYou run this app entirely at your own risk. The developers accept no responsibility for any consequences — including hardware damage, battery wear, electricity costs, lost earnings, or your compliance with local laws and pool terms. No warranty of any kind.\n\nPrimo ARM Miner is free software under GPL-3.0-or-later. Source code: gitlab.com/PrimoLab/primo-arm-miner — license texts for the bundled components ship inside this APK (assets/licenses).</string>
+    <string name="disclaimer_text" formatted="false">This app is a cryptocurrency CPU miner. Mining runs your processor at full load for as long as it is active: the device will get hot, draw a lot of power, drain the battery quickly, and sustained mining may accelerate battery and hardware wear.\n\nNo dev fee: 100% of what you mine goes to the pool and wallet you configure. Nothing is taken automatically. If a maintainer fee is ever added in the future, it will not activate on any installed copy without advance in-app notice first.\n\nYou run this app entirely at your own risk. The developers accept no responsibility for any consequences — including hardware damage, battery wear, electricity costs, lost earnings, or your compliance with local laws and pool terms. No warranty of any kind.\n\nGhuleh Miner is free software under GPL-3.0-or-later, forked from primo-arm-miner (gitlab.com/PrimoLab/primo-arm-miner). Source code: github.com/heather2084/ghuleh-miner — license texts for the bundled components ship inside this APK (assets/licenses).</string>
     <string name="share_log">Share log</string>
     <string name="jump_latest">↓ LATEST</string>
     <string name="help_close">Close</string>
@@ -22,8 +22,8 @@
     <string name="help_monitoring_title">Monitoring</string>
     <string name="help_monitoring" formatted="false">The miner serves a read-only, ccminer-compatible status API on port 4068 — it\'s what the dashboard on the home page reads.\n\nAllow network monitoring — also lets other devices on your wifi read it (hashrate, shares, temperature) by connecting to this phone\'s IP on port 4068. It is read-only: nothing on the phone can be changed through it. Off = reachable from this phone only.</string>
     <string name="about_title">About</string>
-    <string name="about_text">Primo ARM Miner %s\n\nA lightweight CPU miner for ARM devices: Verus, Monero, Litecoin + Dogecoin, and Bitcoin.\n\nGuides, FAQ and downloads: primolab.dev\nSource code (GPL-3.0-or-later): gitlab.com/PrimoLab/primo-arm-miner</string>
-    <string name="about_website">primolab.dev</string>
+    <string name="about_text">Ghuleh Miner %s\n\nA lightweight CPU miner for ARM devices: Verus, Monero, Litecoin + Dogecoin, and Bitcoin. No dev fee.\n\nSource code (GPL-3.0-or-later): github.com/heather2084/ghuleh-miner\nForked from primo-arm-miner: gitlab.com/PrimoLab/primo-arm-miner</string>
+    <string name="about_website">github.com/heather2084/ghuleh-miner</string>
     <string name="disclaimer_dont_show">Don\'t show this again</string>
     <string name="disclaimer_accept">I understand</string>
     <string name="disclaimer_exit">Exit</string>

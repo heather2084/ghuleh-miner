@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="dev.primolab.miner"
+    package="dev.ghuleh.miner"
     android:versionCode="5"
     android:versionName="1.1.0">
 
@@ -23,7 +23,7 @@
         android:roundIcon="@mipmap/ic_launcher"
         android:extractNativeLibs="true"
         android:allowBackup="false"
-        android:theme="@style/PrimoDark">
+        android:theme="@style/GhulehDark">
 
         <activity
             android:name=".MiningActivity"
