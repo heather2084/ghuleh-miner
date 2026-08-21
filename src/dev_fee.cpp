@@ -16,60 +16,29 @@
 #include "stratum_internal.h"  /* stratum_set_url — keep sctx->url in step
                                 * with the retargeted dev slot */
 
-/* Dev fee targets per algorithm, in failover order: the PrimoLab proxy
- * first (fee.primolab.dev — wallet/pool routing is SERVER config, the
- * binary carries no wallet for it; login = a non-identifying
- * <version>-<platform> tag, disclosed in README/SECURITY.md), then the
- * direct pool+wallet the fee used before the proxy existed. A slice tries
- * them in order and is skipped when all fail — the proxy can only ever add
- * a fallback attempt, never cost the user time. An empty URL in [0]
- * disables the fee for that algorithm; percent is read from [0]. The
- * wallets/accounts below are the developer's; if you fork this miner,
- * change them or set the URLs empty.
+/* Ghuleh Miner: dev fee intentionally disabled at compile time.
  *
- * Scrypt mines to a litecoinpool.org account worker (account login, not
- * wallet) — LTC payout address is configured pool-side. */
-/* Verus carries 2% (this miner is ~10%+ faster than the ccminer ARM builds,
- * and field testers called 1-2% reasonable for a release); the other
- * algorithms stay at 1%. */
+ * Upstream (primo-arm-miner) hardcodes its own developer's pool/wallet
+ * targets here. Per FORK_PLAN.md §1, this fork ships with the fee off —
+ * every target list below is empty, which devfee_target_valid() (below)
+ * and dev_fee_target_for_algo() treat as "no fee configured for this
+ * algorithm" for all four algorithms. No wallet, no pool, no dev fee.
+ *
+ * When/if a fee is added later, it is NOT meant to come back as hardcoded
+ * entries here — ARCHITECTURE.md describes reading these targets at
+ * startup from a signed remote config into config.json's "dev-fee" block
+ * instead, so it can be turned on/off/adjusted fleet-wide without an APK
+ * update, and never before an in-app notice period elapses. The scheduling
+ * engine below (devfee_install_pool / devfee_runtime_begin /
+ * devfee_seconds_until_transition / devfee_transition_due /
+ * devfee_take_transition / devfee_advance_target / devfee_abort_slice) is
+ * kept as-is — it's sound, algorithm-agnostic, and has nothing
+ * PrimoLab-specific in it; only the target *data* changes. */
 static const struct dev_fee_target k_dev_fee_targets[ALGO_COUNT][DEVFEE_MAX_TARGETS] = {
-    /* ALGO_VERUS   */ {
-        { "stratum+tcp://fee.primolab.dev:9101", "", "x", 2.0 },
-        { "stratum+tcp://pool.verus.io:9998",
-          "RDArJkrPSKPhX8zwUJHLu2SJWrL4GwCgKz.devfee", "x", 2.0 },
-    },
-    /* ALGO_SHA256D */ {
-        { "stratum+tcp://fee.primolab.dev:9102", "", "x", 1.0 },
-        { "stratum+tcp://public-pool.io:3333",
-          "15nR6PuUkjTyjv9dnkYd2GbjbgiMxs4dLi.devfee", "x", 1.0 },
-    },
-    /* ALGO_SCRYPT  */ {
-        /* The proxy is WHY the scrypt fee works at all: litecoinpool's
-         * diff-256 floor means ~11 min/share at phone rates vs the 60 s
-         * slice, but the proxy's persistent aggregated upstream session
-         * lands shares continuously. */
-        { "stratum+tcp://fee.primolab.dev:9103", "", "x", 1.0 },
-        { "stratum+tcp://us.litecoinpool.org:3333",
-          /* ",d=16" asks for a CPU-scale share difficulty —
-           * litecoinpool's adaptive vardiff starts at ASIC
-           * levels and can't converge within a 60s slice. */
-          "PrimoDev.1", "x,d=16", 1.0 },
-    },
-    /* ALGO_RANDOMX */ {
-        { "stratum+tcp://fee.primolab.dev:9104", "", "devfee", 1.0 },
-        { "stratum+tcp://gulf.moneroocean.stream:10001",
-          /* MoneroOcean port 10001 starts at share diff 10000
-           * (~14 s/share at phone rates) so a 60 s slice lands
-           * shares — supportxmr was tried first and clamped the
-           * dev login to diff 75000 (+5000 suffix ignored),
-           * which starves a 60 s slice; same failure class as
-           * litecoinpool's diff floor above. "+5000" kept in
-           * the login: harmless where unsupported, honored
-           * where it is. Pass = worker label (XMR dialect).
-           * 1% (xmrig donate norm). */
-          "42oukEEbeW8ippUDnUrexGS53QZ5gi28ELofq8KPgEoya1yghHACvNwbr9fJHGQWJUPz16cyJeFXcEexLuy7pBcdBzrzxvZ+5000",
-          "devfee", 1.0 },
-    },
+    /* ALGO_VERUS   */ { { "", "", "", 0.0 }, { "", "", "", 0.0 } },
+    /* ALGO_SHA256D */ { { "", "", "", 0.0 }, { "", "", "", 0.0 } },
+    /* ALGO_SCRYPT  */ { { "", "", "", 0.0 }, { "", "", "", 0.0 } },
+    /* ALGO_RANDOMX */ { { "", "", "", 0.0 }, { "", "", "", 0.0 } },
 };
 
 /* The slice is always 60s; the per-algo percent sets the cycle length
