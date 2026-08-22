@@ -1,12 +1,12 @@
-# Build + release pipeline for primo-arm-miner.
+# Build + release pipeline for ghuleh-miner.
 #
 # Every push to master and every manual dispatch builds and smoke-tests both
 # artifacts; pushing a v* tag additionally attaches them to a GitHub release.
 #
-# Artifacts (canonical unversioned names — install.sh fetches these via the
+# Artifacts (canonical unversioned names, downloaded via the
 # /releases/latest/download/ redirect, no API calls or jq needed):
-#   primo-arm-miner-linux-arm64.tar.gz    glibc build for arm64 SBCs/servers
-#   primo-arm-miner-android-arm64.tar.gz  Termux/bionic build for phones
+#   ghuleh-miner-linux-arm64.tar.gz    glibc build for arm64 SBCs/servers
+#   ghuleh-miner-android-arm64.tar.gz  Termux/bionic build for phones
 #
 # Both jobs run on GitHub's free arm64 runners (ubuntu-24.04-arm; free for
 # public repos only — private repos bill these runners).
@@ -65,32 +65,32 @@ jobs:
       - name: Smoke test (newer-glibc host also proves forward compat)
         run: |
           sudo apt-get update && sudo apt-get install -y libcurl4 libjansson4
-          ./primo-arm-miner --version
+          ./ghuleh-miner --version
           # Runner cores (Neoverse) have the required AES/PMULL/SHA2 crypto
           # extensions. A short scrypt benchmark exercises the startup
           # self-test (SoA-4 vs reference cross-check) plus real hashing.
-          timeout 25 ./primo-arm-miner --benchmark -a scrypt -t 2 2>&1 | tee smoke.log || true
+          timeout 25 ./ghuleh-miner --benchmark -a scrypt -t 2 2>&1 | tee smoke.log || true
           grep -q "Scrypt self-test passed" smoke.log
-          timeout 20 ./primo-arm-miner --benchmark -a verus -t 2 2>&1 | tee smoke2.log || true
+          timeout 20 ./ghuleh-miner --benchmark -a verus -t 2 2>&1 | tee smoke2.log || true
           grep -Eq "Hashrate: [0-9]" smoke2.log
 
       - name: Package
         run: |
           mkdir -p dist
-          tar -czf dist/primo-arm-miner-linux-arm64.tar.gz \
-            primo-arm-miner LICENSE NOTICE README.md CONFIG_EXAMPLES.md \
+          tar -czf dist/ghuleh-miner-linux-arm64.tar.gz \
+            ghuleh-miner LICENSE NOTICE README.md CONFIG_EXAMPLES.md \
             PROVENANCE.md LICENSES
 
       - uses: actions/upload-artifact@v4
         with:
-          name: primo-arm-miner-linux-arm64
-          path: dist/primo-arm-miner-linux-arm64.tar.gz
+          name: ghuleh-miner-linux-arm64
+          path: dist/ghuleh-miner-linux-arm64.tar.gz
 
       - name: Attach to release
         if: startsWith(github.ref, 'refs/tags/v')
         uses: softprops/action-gh-release@v2
         with:
-          files: dist/primo-arm-miner-linux-arm64.tar.gz
+          files: dist/ghuleh-miner-linux-arm64.tar.gz
 
   android-arm64:
     runs-on: ubuntu-24.04-arm
@@ -112,25 +112,25 @@ jobs:
             bash -lc "
               yes | pkg update || true
               bash build_termux.sh &&
-              ./primo-arm-miner --version &&
-              (timeout 25 ./primo-arm-miner --benchmark -a scrypt -t 2 2>&1 | tee smoke.log || true) &&
+              ./ghuleh-miner --version &&
+              (timeout 25 ./ghuleh-miner --benchmark -a scrypt -t 2 2>&1 | tee smoke.log || true) &&
               grep -q 'Scrypt self-test passed' smoke.log
             "
 
       - name: Package
         run: |
           mkdir -p dist
-          tar -czf dist/primo-arm-miner-android-arm64.tar.gz \
-            primo-arm-miner LICENSE NOTICE README.md CONFIG_EXAMPLES.md \
+          tar -czf dist/ghuleh-miner-android-arm64.tar.gz \
+            ghuleh-miner LICENSE NOTICE README.md CONFIG_EXAMPLES.md \
             PROVENANCE.md LICENSES
 
       - uses: actions/upload-artifact@v4
         with:
-          name: primo-arm-miner-android-arm64
-          path: dist/primo-arm-miner-android-arm64.tar.gz
+          name: ghuleh-miner-android-arm64
+          path: dist/ghuleh-miner-android-arm64.tar.gz
 
       - name: Attach to release
         if: startsWith(github.ref, 'refs/tags/v')
         uses: softprops/action-gh-release@v2
         with:
-          files: dist/primo-arm-miner-android-arm64.tar.gz
+          files: dist/ghuleh-miner-android-arm64.tar.gz
