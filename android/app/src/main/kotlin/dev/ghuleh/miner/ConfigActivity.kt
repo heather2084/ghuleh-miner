@@ -37,10 +37,10 @@ class ConfigActivity : Activity() {
     private var ready = false
     private var accent = Palette.TEAL
 
-    /** Re-tint the accent-carrying views to the selected algorithm's coin
-     *  color, so the page previews the scheme the dashboard will wear. */
+    /** Re-tint the accent-carrying views to the app's teal brand color,
+     *  matching the dashboard (uniform regardless of the selected algorithm). */
     private fun applyAccent(algo: String) {
-        accent = Palette.accentFor(algo)
+        accent = Palette.TEAL
         findViewById<TextView>(R.id.sectionMiner).setTextColor(accent)
         findViewById<TextView>(R.id.sectionPools).setTextColor(accent)
         findViewById<TextView>(R.id.sectionMonitoring).setTextColor(accent)

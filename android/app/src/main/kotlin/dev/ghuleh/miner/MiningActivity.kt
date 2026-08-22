@@ -53,8 +53,9 @@ class MiningActivity : Activity() {
     private val DIM = Color.parseColor("#9789B8")
     private val TEXT = Color.parseColor("#F1EEFA")
 
-    /** Live accent = the active algorithm's coin color (Palette). Everything
-     *  accent-tinted is re-applied through applyAccent() when it changes. */
+    /** Live accent = the app's teal brand color, applied uniformly regardless
+     *  of which coin/algorithm is active. Everything accent-tinted is
+     *  re-applied through applyAccent() when it changes. */
     private var accent = Palette.TEAL
     private var accentAlgo: String? = null
 
@@ -62,7 +63,7 @@ class MiningActivity : Activity() {
         val normalized = algoName?.trim()?.lowercase()
         if (normalized == accentAlgo) return
         accentAlgo = normalized
-        accent = Palette.accentFor(normalized)
+        accent = Palette.TEAL
         val d = resources.displayMetrics.density
         heroCard.background = Palette.heroCard(accent, d)
         algo.background = Palette.badge(accent, d)
