@@ -12,6 +12,12 @@
 # Local miner config (contains wallet/worker credentials; see CONFIG_EXAMPLES.md)
 /config.json
 
+# Release signing key material -- NEVER commit. This must live only on the
+# device that builds releases (and in your own secure backup), never in git.
+*.jks
+*.keystore
+keystore.properties
+
 # Local development files (not part of the public tree)
 /CLAUDE.md
 /docs/
