@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
-# Build primo-arm-miner natively in Termux on Android.
+# Build ghuleh-miner natively in Termux on Android.
 # Run from the repo root: bash build_termux.sh
 set -euo pipefail
 
-BINARY="primo-arm-miner"
+BINARY="ghuleh-miner"
 
 die()  { echo "Error: $*" >&2; exit 1; }
 info() { echo "==> $*"; }
@@ -11,7 +11,7 @@ info() { echo "==> $*"; }
 # ── Sanity checks ─────────────────────────────────────────────────────────────
 
 [ -f Makefile ] && [ -f src/miner.cpp ] \
-    || die "Run this script from the primo-arm-miner repo root"
+    || die "Run this script from the ghuleh-miner repo root"
 
 # ── Dependencies ──────────────────────────────────────────────────────────────
 
@@ -98,8 +98,8 @@ if [ -n "${CLANG_PREFIX:-}" ]; then
     # Dropping the implicit -lc++ makes libunwind.a link in statically and
     # leaves libc++_shared.so as the only C++ runtime. Verify after any change
     # to this link line:
-    #   readelf -d primo-arm-miner | grep NEEDED        # must NOT list libc++.so
-    #   readelf --dyn-syms -W primo-arm-miner | grep _Unwind   # must be empty
+    #   readelf -d ghuleh-miner | grep NEEDED        # must NOT list libc++.so
+    #   readelf --dyn-syms -W ghuleh-miner | grep _Unwind   # must be empty
     [ -f "$TERMUX_USR/lib/libc++_shared.so" ] && \
         LINK_EXTRA="$LINK_EXTRA -nostdlib++ -lc++_shared"
 

@@ -3,7 +3,7 @@ set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 BUILD_DIR="$SCRIPT_DIR/build"
-ROOT_BINARY="$SCRIPT_DIR/primo-arm-miner"
+ROOT_BINARY="$SCRIPT_DIR/ghuleh-miner"
 CMAKE_BIN="${CMAKE:-cmake}"
 
 rm -rf "$BUILD_DIR"
@@ -31,7 +31,7 @@ fi
 
 "$CMAKE_BIN" --build "$BUILD_DIR" -j"$(nproc)"
 
-install -m 755 "$BUILD_DIR/primo-arm-miner" "$ROOT_BINARY"
+install -m 755 "$BUILD_DIR/ghuleh-miner" "$ROOT_BINARY"
 
 echo "Build complete! Binary: $ROOT_BINARY"
 echo "Size: $(ls -lh "$ROOT_BINARY" | awk '{print $5}')"

@@ -90,16 +90,16 @@ echo "==> relinking static"
   "$SDEPS/lib/libmbedtls.a" "$SDEPS/lib/libmbedx509.a" "$SDEPS/lib/libmbedcrypto.a" \
   "$SDEPS/lib/libjansson.a" $RANDOMX_LINK_LIB \
   "$PREFIX/lib/libc++_shared.so" -lm \
-  -o primo-arm-miner
+  -o ghuleh-miner
 
 echo "==> NEEDED (want only libm/libc++/libdl/libc):"
-readelf -d primo-arm-miner | grep NEEDED
+readelf -d ghuleh-miner | grep NEEDED
 
 # 5. stage libprimo.so + libc++_shared.so (the NEEDED name — MinerService sets
 #    LD_LIBRARY_PATH to this dir) into jniLibs
 mkdir -p "$JNI"
 rm -f "$JNI/libc++.so"   # pre-RandomX builds staged it under this name
-cp primo-arm-miner "$JNI/libprimo.so"
+cp ghuleh-miner "$JNI/libprimo.so"
 cp "$PREFIX/lib/libc++_shared.so" "$JNI/libc++_shared.so"
 echo "==> staged $JNI/{libprimo.so,libc++_shared.so}"
 echo "==> now: cd android && bash build_apk_termux.sh"

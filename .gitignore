@@ -2,7 +2,7 @@
 *.o
 *.d
 /build/
-/primo-arm-miner
+/ghuleh-miner
 /third_party/RandomX/build/
 
 # Android APK build outputs + staged native binary (do not commit binaries)

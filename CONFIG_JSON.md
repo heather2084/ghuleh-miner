@@ -1,13 +1,13 @@
 # Config JSON Reference
 
-This document describes the supported `config.json` format for `primo-arm-miner`.
+This document describes the supported `config.json` format for `ghuleh-miner`.
 
 For shorter copy-paste examples, see [`CONFIG_EXAMPLES.md`](CONFIG_EXAMPLES.md).
 
 ## Loading Rules
 
-- If you run `./primo-arm-miner` and `./config.json` exists, it is loaded automatically.
-- You can load a different file with `./primo-arm-miner -c /path/to/file.json`.
+- If you run `./ghuleh-miner` and `./config.json` exists, it is loaded automatically.
+- You can load a different file with `./ghuleh-miner -c /path/to/file.json`.
 - Explicit CLI flags override values from the config file.
 - Top-level settings act as defaults. Pool-local settings override those defaults where supported.
 

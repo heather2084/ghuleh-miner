@@ -194,10 +194,10 @@ runtime. (To force the portable C CLHash path for debugging: `VERUS_ASM=0`.)
 
 ```bash
 # Basic mining
-./primo-arm-miner -a verus -o stratum+tcp://pool.verus.io:9998 -u WALLET.worker
+./ghuleh-miner -a verus -o stratum+tcp://pool.verus.io:9998 -u WALLET.worker
 
 # With all options
-./primo-arm-miner \
+./ghuleh-miner \
   -a verus \
   -o stratum+tcp://pool.verus.io:9998 \
   -u RWallet123.worker \
@@ -205,31 +205,31 @@ runtime. (To force the portable C CLHash path for debugging: `VERUS_ASM=0`.)
   -t 8
 
 # Benchmark mode
-./primo-arm-miner --benchmark -t 4
+./ghuleh-miner --benchmark -t 4
 
 # Benchmark scrypt
-./primo-arm-miner -a scrypt --benchmark -t 4
+./ghuleh-miner -a scrypt --benchmark -t 4
 
 # Benchmark sha256d
-./primo-arm-miner -a sha256d --benchmark -t 4
+./ghuleh-miner -a sha256d --benchmark -t 4
 
 # Mine Monero (RandomX; aliases: randomx / rx / xmr / monero)
-./primo-arm-miner -a randomx -o stratum+tcp://pool.supportxmr.com:3333 -u XMR_WALLET -p x
+./ghuleh-miner -a randomx -o stratum+tcp://pool.supportxmr.com:3333 -u XMR_WALLET -p x
 
 # TLS pools: use stratum+ssl:// (stratum+tcps:// also accepted). Requires a
 # TLS-enabled libcurl (any stock distro libcurl qualifies); certificates are
 # not verified, matching common miner behavior — pool certs are self-signed.
-./primo-arm-miner -a randomx -o stratum+ssl://pool.supportxmr.com:443 -u XMR_WALLET -p x
+./ghuleh-miner -a randomx -o stratum+ssl://pool.supportxmr.com:443 -u XMR_WALLET -p x
 ```
 
 ### JSON Config File (ccminer-compatible)
 
 ```bash
 # Auto-load local ./config.json when present
-./primo-arm-miner
+./ghuleh-miner
 
 # Or load an explicit config path
-./primo-arm-miner -c config.json
+./ghuleh-miner -c config.json
 ```
 
 **config.json:**
@@ -283,10 +283,10 @@ This miner is intended to accept the same common config files and command-line a
 
 ```bash
 # Use your existing ccminer config
-./primo-arm-miner -c /path/to/ccminer.conf
+./ghuleh-miner -c /path/to/ccminer.conf
 
 # Or just replace the binary and rely on local ./config.json
-cp primo-arm-miner ccminer
+cp ghuleh-miner ccminer
 ```
 
 ### Supported Options

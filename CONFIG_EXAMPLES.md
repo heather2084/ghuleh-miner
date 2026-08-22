@@ -4,7 +4,7 @@ This file is the short version of the config docs. For the full option reference
 
 ## 1. Minimal Single-Pool Config
 
-Use this when you want `./primo-arm-miner` to start from the local `config.json` with no extra flags.
+Use this when you want `./ghuleh-miner` to start from the local `config.json` with no extra flags.
 
 ```json
 {
@@ -19,7 +19,7 @@ Use this when you want `./primo-arm-miner` to start from the local `config.json`
 Run it with:
 
 ```bash
-./primo-arm-miner
+./ghuleh-miner
 ```
 
 ## 2. Single-Pool Config With API Bind
@@ -80,7 +80,7 @@ The config file provides defaults, and explicit CLI flags win.
 Example:
 
 ```bash
-./primo-arm-miner -t 4
+./ghuleh-miner -t 4
 ```
 
 That keeps the rest of `config.json` but overrides `threads` to `4` for that launch.

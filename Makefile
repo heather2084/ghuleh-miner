@@ -156,7 +156,7 @@ SOURCES_ASM = \
 
 OBJECTS = $(SOURCES_C:.c=.o) $(SOURCES_CPP:.cpp=.o) $(SOURCES_ASM:.S=.o)
 
-TARGET = primo-arm-miner
+TARGET = ghuleh-miner
 
 .PHONY: all clean test
 

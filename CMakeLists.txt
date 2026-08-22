@@ -13,7 +13,7 @@ if(NOT DEFINED CMAKE_CXX_COMPILER)
 endif()
 
 cmake_minimum_required(VERSION 3.10)
-project(primo-arm-miner VERSION 1.1.0 LANGUAGES C CXX ASM)
+project(ghuleh-miner VERSION 1.1.0 LANGUAGES C CXX ASM)
 
 set(CMAKE_C_STANDARD 11)
 set(CMAKE_CXX_STANDARD 14)
@@ -129,11 +129,11 @@ if(PRIMO_RANDOMX)
 endif()
 
 # Executable
-add_executable(primo-arm-miner ${SOURCES})
+add_executable(ghuleh-miner ${SOURCES})
 
 if(PRIMO_RANDOMX)
-    target_compile_definitions(primo-arm-miner PRIVATE PRIMO_RANDOMX=1)
-    target_include_directories(primo-arm-miner PRIVATE third_party/RandomX/src)
+    target_compile_definitions(ghuleh-miner PRIVATE PRIMO_RANDOMX=1)
+    target_include_directories(ghuleh-miner PRIVATE third_party/RandomX/src)
 endif()
 
 # Match Makefile behavior for per-file hot-path tuning.
@@ -149,7 +149,7 @@ set_source_files_properties(
 )
 
 # Link libraries
-target_link_libraries(primo-arm-miner
+target_link_libraries(ghuleh-miner
     ${CURL_LIBRARIES}
     ${JANSSON_LIBRARY}
     Threads::Threads
@@ -157,15 +157,15 @@ target_link_libraries(primo-arm-miner
 )
 
 if(PRIMO_RANDOMX)
-    target_link_libraries(primo-arm-miner randomx)
+    target_link_libraries(ghuleh-miner randomx)
 endif()
 
 # Match the promoted ccminer baseline linker shape.
 if(PRIMO_LINKER)
-    target_link_options(primo-arm-miner PRIVATE "-flto" "-fuse-ld=${PRIMO_LINKER}")
+    target_link_options(ghuleh-miner PRIVATE "-flto" "-fuse-ld=${PRIMO_LINKER}")
 else()
-    target_link_options(primo-arm-miner PRIVATE "-flto")
+    target_link_options(ghuleh-miner PRIVATE "-flto")
 endif()
 
 # Installation
-install(TARGETS primo-arm-miner DESTINATION bin)
+install(TARGETS ghuleh-miner DESTINATION bin)

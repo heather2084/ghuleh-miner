@@ -1,5 +1,6 @@
 /*
- * Shared public types and runtime interfaces for Primo ARM Miner.
+ * Shared public types and runtime interfaces for Ghuleh Miner
+ * (a fork of Primo ARM Miner).
  * Copyright (C) 2026 primo-arm-miner contributors.
  *
  * This header stays C-compatible because the mining back ends span
@@ -25,7 +26,7 @@ extern "C" {
 #include <pthread.h>
 
 // Version
-#define PACKAGE_NAME "primo-arm-miner"
+#define PACKAGE_NAME "ghuleh-miner"
 #define PACKAGE_VERSION "1.1.0"
 #define USER_AGENT PACKAGE_NAME "/" PACKAGE_VERSION
 

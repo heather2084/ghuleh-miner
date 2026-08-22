@@ -1,20 +1,42 @@
 # Distribution & Release Pipeline
 
+**This document describes upstream PrimoLab's own release infrastructure for
+primo-arm-miner — their domain, their forge mirrors, their signing key, their
+maintainer build box. None of it is part of this fork. It's kept below,
+clearly marked, purely as historical/reference context for how the upstream
+project this was forked from does releases. It does not describe
+Ghuleh Miner and none of these URLs, keys, or org links belong to this
+project.**
+
+## How Ghuleh Miner is actually distributed
+
+This fork is not published as a public release feed. It lives in a private
+GitHub repository (`github.com/heather2084/ghuleh-miner`), built and signed
+locally, and installed by sideloading the built APK (or CLI binary) directly
+onto each device. There is no public download site, no forge mirror, and no
+`install.sh` — that script has been removed from this fork because it pointed
+at PrimoLab's own download server, not anything this project controls. See
+the root [README.md](../README.md) for the actual build/install steps.
+
+---
+
+## Upstream's pipeline (historical reference only — not this fork)
+
 How primo-arm-miner gets from a `master` commit to a one-line install on any
-ARM64 device. First written 2026-06-09 for a GitHub-Actions pipeline; rewritten
-2026-07-06 when distribution moved to its current, forge-independent shape.
+ARM64 device, per upstream's own docs. First written 2026-06-09 for a
+GitHub-Actions pipeline; rewritten 2026-07-06 when distribution moved to its
+current, forge-independent shape.
 
-## Canonical downloads: primolab.dev/dl/
+### Canonical downloads: primolab.dev/dl/ (upstream's site, not this fork's)
 
-Releases are served from **<https://primolab.dev/dl/>** — the project's own
-site — and code forges (GitLab, later GitHub) act as mirrors. This is
+Upstream releases are served from **<https://primolab.dev/dl/>** — PrimoLab's
+own site — and code forges (GitLab, later GitHub) act as mirrors. This is
 deliberate: the project's GitHub org was auto-flagged by abuse detection in
-2026-06 (new org + crypto-miner topic), which taught us not to make any single
-forge the load-bearing download host.
+2026-06 (new org + crypto-miner topic), which taught upstream not to make any
+single forge the load-bearing download host.
 
-Per release, `/dl/` holds versioned artifacts plus stable "latest" aliases
-(what `install.sh` fetches), each with a `.sha256` next to it and a combined
-`SHA256SUMS`:
+Per release, `/dl/` holds versioned artifacts plus stable "latest" aliases,
+each with a `.sha256` next to it and a combined `SHA256SUMS`:
 
 | Asset | Target |
 |---|---|
@@ -26,12 +48,12 @@ Each tarball contains the binary plus `LICENSE`, `NOTICE`, `README.md`,
 `CONFIG_EXAMPLES.md`, and `PROVENANCE.md` — binaries never travel without the
 GPL license text.
 
-**Release APK signing certificate (SHA-256 digest, same key forever):**
-`c28b614c2f6c67673ae1b1c98db914bbfb11853c0a3d49a6190ba233981cd8c3`
-A changed digest would force users to uninstall/reinstall; verify with
-`apksigner verify --print-certs primo-arm-miner.apk`.
+**Upstream's release APK signing certificate (SHA-256 digest, their key, not
+this fork's):** `c28b614c2f6c67673ae1b1c98db914bbfb11853c0a3d49a6190ba233981cd8c3`.
+This fork is signed with a separate, independently generated key — see the
+main project README for how to verify a Ghuleh Miner build.
 
-## Forge mirrors
+### Forge mirrors (upstream's)
 
 - **GitLab (live since v1.0.7)**: <https://gitlab.com/PrimoLab/primo-arm-miner>
   — full source history, tags, and per-release pages. Release assets are
@@ -53,9 +75,10 @@ A changed digest would force users to uninstall/reinstall; verify with
   the original flag. Re-enable deliberately or never; `/dl/` is canonical.
 
 Artifact SHA-256s must be byte-identical between `/dl/` and every mirror —
-a divergence means a stale or tampered mirror and is a release-blocker.
+a divergence means a stale or tampered mirror and is a release-blocker
+(for upstream's own release process).
 
-## How releases are built (maintainer side)
+### How upstream builds releases (their maintainer side)
 
 One command on the project's own arm64 box, using two frozen container
 images (an aarch64 host is non-negotiable — see "Why not cross-compile"):
@@ -68,8 +91,8 @@ images (an aarch64 host is non-negotiable — see "Why not cross-compile"):
   on-device — Termux's stock newer clang measured ~5% slower on Verus).
 - Artifacts are `--version`-verified, SHA-256'd, and staged to `/dl/`.
 
-The orchestration script and its runbook live in the (separate, private)
-site repository. The container images were validated by A/B against
+The orchestration script and its runbook live in upstream's (separate,
+private) site repository. The container images were validated by A/B against
 phone-built golden binaries before being trusted (CLI hashrate mid-bracket,
 APK live-mined all four algorithms with zero rejects).
 
@@ -77,14 +100,14 @@ APK live-mined all four algorithms with zero rejects).
 toolchain identity is a *measured* performance variable. Consensus-critical
 hash code gets built by the exact validated toolchain or not at all.
 
-**glibc floor (check this every time the linux builder image changes):**
-the linux binary's floor is whatever glibc the builder container has.
-History: v1.0.5's first build (Ubuntu 24.04 runner) required GLIBC_2.38 and
-would not start on Debian 12 or Raspberry Pi OS — caught only by a real
-install test. Current builder (Debian 12 "bookworm") yields a **GLIBC_2.34
-floor**: covers Debian 12+, Ubuntu 22.04+, current Raspberry Pi OS and
-Armbian; drops Debian 11 (glibc 2.31, LTS ends 2026-08). Verify after any
-image rebuild: `objdump -T primo-arm-miner | grep -oE 'GLIBC_[0-9.]+' | sort -Vu | tail -1`.
+**glibc floor (upstream's builder, checked every time their linux builder
+image changes):** the linux binary's floor is whatever glibc the builder
+container has. History: v1.0.5's first build (Ubuntu 24.04 runner) required
+GLIBC_2.38 and would not start on Debian 12 or Raspberry Pi OS — caught only
+by a real install test. Current builder (Debian 12 "bookworm") yields a
+**GLIBC_2.34 floor**: covers Debian 12+, Ubuntu 22.04+, current Raspberry Pi
+OS and Armbian; drops Debian 11 (glibc 2.31, LTS ends 2026-08). Verify after
+any image rebuild: `objdump -T primo-arm-miner | grep -oE 'GLIBC_[0-9.]+' | sort -Vu | tail -1`.
 
 **Runtime dependencies: libcurl + libjansson only.** OpenSSL was removed
 2026-06-10 — it was two calls (SHA-1 + base64 for the WebSocket handshake),
@@ -94,21 +117,25 @@ old-glibc build was meant to solve. The binary's `NEEDED` list is
 libcurl.so.4, libjansson.so.4, libm, libstdc++, libc — all decade-stable.
 (TLS stratum rides the *system* libcurl; no TLS library is linked.)
 
-## GitHub Actions workflow (dormant mirror path)
+This applies equally to builds of this fork, since the source it's built
+from is unchanged in this respect.
 
-`.github/workflows/release.yml` still exists and can build both tarballs on
-GitHub's free arm64 runners, but **Actions is disabled repo-wide on GitHub**
-(see Forge mirrors above) and it is **not** the canonical release path —
-the containerized on-box pipeline above is. If it is ever revived, its three
-historical CI fixes still apply: `chmod -R a+w` the checkout before the
-termux container (uid mismatch), build + smoke-test in ONE container session,
-and build the linux artifact inside an old-glibc container (see floor above).
-Never enable shared CI runners on the GitLab mirror (x86_64 anyway).
+### GitHub Actions workflow in this repo
 
-## Portability of the optimized paths (one binary really is enough)
+`.github/workflows/release.yml` in this fork is a mechanically-renamed copy
+of upstream's build/smoke-test workflow (artifact names updated to
+`ghuleh-miner-*`). It builds and smoke-tests the tarballs on GitHub's free
+arm64 runners; it does not publish anywhere on its own, and this fork does
+not run a public release pipeline. If it is ever used, its three historical
+CI fixes still apply: `chmod -R a+w` the checkout before the termux
+container (uid mismatch), build + smoke-test in ONE container session, and
+build the linux artifact inside an old-glibc container (see floor above).
+
+### Portability of the optimized paths (applies to this fork too)
 
 Everything performance-critical adapts at **runtime**, which is what makes
-single-binary distribution safe:
+single-binary distribution safe — this is unchanged source behavior shared
+with upstream:
 
 - ARMv8 crypto extensions (AES/PMULL/SHA2) are detected at startup; the
   miner refuses to run without them (they are baseline on every ARMv8
@@ -130,38 +157,18 @@ single-binary distribution safe:
 - **SHA256d**: the dual-nonce asm helps in-order and OoO cores alike; NEON
   fallback exists for (hypothetical) cores without the SHA2 extension.
 
-## install.sh
+### install.sh (removed from this fork)
 
-POSIX sh (no bash dependency — minimal SBC images may lack it).
+Upstream ships a POSIX `install.sh` that downloads pre-built binaries from
+`primolab.dev`. This fork removed that script because it silently fetched
+someone else's binaries under this project's name — this fork is
+build-from-source only (see the root README).
 
-    curl -fsSL https://primolab.dev/install.sh | sh
-
-What it does: detects Termux vs Linux and `aarch64`, rejects 32-bit ARM with
-an explanation (ARMv8 crypto required), warns if `/proc/cpuinfo` lacks
-`aes`, downloads the right asset from `/dl/`, **verifies its SHA-256 against
-the published `.sha256`** (hard-fails on mismatch; https enforced for the
-default URL), installs runtime libs best-effort, installs to `$PREFIX/bin`
-(Termux) or `/usr/local/bin` (falling back to `~/.local/bin` without sudo),
-verifies the binary runs, prints a mining quickstart.
-
-Environment overrides:
-
-| Variable | Purpose |
-|---|---|
-| `PRIMO_BASE_URL` | Download directory base (default `https://primolab.dev/dl`; mirrors) |
-| `PRIMO_INSTALL_DIR` | Target directory for the binary |
-| `PRIMO_DOWNLOAD_URL` | Full tarball URL (mirrors / testing; https not enforced for explicit overrides) |
-
-The copy served at `primolab.dev/install.sh` is synced from this repo —
-re-sync it whenever `install.sh` changes here.
-
-## Release verification (repeat every release)
-
-1. Re-download the artifacts **over the live domain** and compare SHA-256s
-   against the staged sums.
-2. Run the real one-liner in a fresh environment (clean container or box):
-   `curl -fsSL https://primolab.dev/install.sh | sh` →
-   `primo-arm-miner --version`. The v1.0.5 glibc bug was caught only by
-   this kind of real install test — never skip it.
-3. `apksigner verify --print-certs` on the APK: digest must match the one
-   published above.
+For reference, what upstream's script did: detects Termux vs Linux and
+`aarch64`, rejects 32-bit ARM with an explanation (ARMv8 crypto required),
+warns if `/proc/cpuinfo` lacks `aes`, downloads the right asset from
+upstream's `/dl/`, verifies its SHA-256 against the published `.sha256`
+(hard-fails on mismatch; https enforced for the default URL), installs
+runtime libs best-effort, installs to `$PREFIX/bin` (Termux) or
+`/usr/local/bin` (falling back to `~/.local/bin` without sudo), verifies the
+binary runs, prints a mining quickstart.

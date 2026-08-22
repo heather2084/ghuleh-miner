@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Repo test harness for primo-arm-miner: `make test` runs this.
+# Repo test harness for ghuleh-miner: `make test` runs this.
 #
 # T1  sha256d init self-tests gate mining ("abc" vectors + dual-asm cross-check)
 # T2  scrypt init self-test (single vs dual vs SoA-4 cross-validation)
@@ -20,7 +20,7 @@
 # up. Total runtime ~45 s on an RK3588. Exit 0 = all pass (skips allowed).
 set -u
 
-BIN=$(readlink -f "${1:-./primo-arm-miner}")
+BIN=$(readlink -f "${1:-./ghuleh-miner}")
 REPO=$(cd "$(dirname "$0")/.." && pwd)
 WORK=$(mktemp -d)
 PASS=0; FAIL=0; SKIP=0

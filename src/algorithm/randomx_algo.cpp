@@ -29,7 +29,7 @@
 
 /* Built-in key for --benchmark (no pool / no seed_hash). The key only selects
  * the dataset contents; throughput is key-independent. */
-static const char k_benchmark_key[] = "primo-arm-miner randomx benchmark key";
+static const char k_benchmark_key[] = "ghuleh-miner randomx benchmark key";
 
 /* Reference vector from third_party/RandomX/src/tests/tests.cpp — guards
  * against miscompilation (fast-math leaking in), JIT breakage, or bad flags. */
