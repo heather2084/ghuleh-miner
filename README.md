@@ -1,37 +1,29 @@
-# Primo ARM Miner
+# Ghuleh Miner
 
 A minimal, pure ARM-native multi-algorithm cryptocurrency miner — no x86 compatibility layer — with a ccminer-compatible CLI and configuration surface.
 
-**Website: <https://primolab.dev>** — per-coin setup guides (Verus, Monero,
-LTC+DOGE, Bitcoin), downloads, config/CLI/API reference, and FAQ.
-
-**Guides: <https://primolab.dev/guides>** — hands-on walkthroughs:
-[mine on Android with Termux](https://primolab.dev/guides-termux-miner.html),
-[install the Android APK](https://primolab.dev/guides-android-apk-setup.html),
-and [old phone vs ESP32 NerdMiner](https://primolab.dev/guides-old-phone-vs-esp32.html).
-
-**Source & releases: <https://gitlab.com/PrimoLab/primo-arm-miner>** —
-canonical downloads stay on [primolab.dev/dl](https://primolab.dev/dl/); the
-GitLab releases mirror the same artifacts (identical SHA-256s).
+*A fork of [PrimoLab's primo-arm-miner](https://gitlab.com/PrimoLab/primo-arm-miner) (GPL-3.0-or-later) — see [NOTICE](NOTICE) and [PROVENANCE.md](PROVENANCE.md) for full ancestry.*
 
 ## Quick Install (Linux arm64 / Termux)
 
+This is a source-only fork — there's no separate hosted installer. Build
+directly from the repo:
+
 ```bash
-curl -fsSL https://primolab.dev/install.sh | sh
+git clone https://github.com/heather2084/ghuleh-miner.git
+cd ghuleh-miner
+make -j"$(nproc)"
 ```
 
-Downloads the prebuilt binary for your platform (arm64 SBC or Android/Termux),
-verifies its SHA-256, installs runtime libraries, and prints a mining
-quickstart. ARMv8 crypto
-extensions (AES/PMULL/SHA2) are required — standard on every 64-bit ARM SoC
-of the last decade.
+See [Building](#building) below for CMake, Termux-specific build scripts,
+and toolchain overrides. ARMv8 crypto extensions (AES/PMULL/SHA2) are
+required — standard on every 64-bit ARM SoC of the last decade.
 
 ### Runtime packages
 
-The binary links two shared libraries: **libcurl** and **libjansson**. The
-installer pulls them in automatically; if you grab the binary manually, or the
-auto-install fails (the miner then exits with a missing-library error), install
-them yourself:
+The binary links two shared libraries: **libcurl** and **libjansson**. If
+they're not already on your system, install them before running the miner
+(it exits with a missing-library error otherwise):
 
 ```bash
 # Debian / Ubuntu / Armbian / Raspberry Pi OS (arm64)
@@ -334,43 +326,14 @@ Startup uses the same retry policy as steady-state reconnects. With `-r -1`, the
 
 ## Dev Fee
 
-The miner includes a small development fee, taken as one 60-second time
-slice per cycle of mining on the developer's pool/wallet for the active
-algorithm:
+**Dev fee is disabled in this fork.** The fee targets in `src/dev_fee.cpp`
+are compiled out entirely (empty per-algorithm target list), so the fee
+scheduler never arms and no time slice is ever taken on any algorithm.
 
-- **Verus: 2%** (60s per 50 minutes) — reflecting that this miner is
-  ~10%+ faster on Verus than the ccminer ARM builds it replaces
-- **SHA256d / Scrypt / RandomX: 1%** (60s per 100 minutes)
-
-The first slice lands at a random point within the first cycle (re-drawn
-every start, so the fee can't be skipped with scheduled restarts); very
-short sessions usually pay nothing. If a dev target is ever unreachable,
-the slice is skipped immediately — your mining time is never held up by it.
-One caveat for RandomX on a non-Monero rx/0 chain (e.g. Zephyr): the dev
-pool mines Monero, so each fee slice re-keys the shared dataset on entry
-and again on return (~14 s each in fast mode) — a real-world overhead the
-1% figure doesn't capture on those chains. Mining Monero itself has no
-such cost (same seed, no re-key).
-
-**Routing and privacy.** Each fee slice first connects to PrimoLab's
-aggregating stratum proxy at `fee.primolab.dev` (source:
-[primo-miner-proxy](https://gitlab.com/PrimoLab/primo-miner-proxy)), which
-lets the pool/wallet/coin be changed server-side without a new miner
-release and lets many miners' short slices share one persistent pool
-session (this is what makes the scrypt fee viable at all). If the proxy is
-unreachable the slice falls back to a direct pool+wallet compiled into the
-binary, and if that also fails the slice is skipped — the fee can only ever
-*add* a fallback attempt, never cost you mining time. The proxy login is a
-non-identifying `<version>-<platform>` tag (e.g. `1.1.0-cli`, `1.1.0-apk`) —
-**never your wallet or a user identifier**; the proxy substitutes the real
-dev wallet on its side. That tag gives us anonymous version-distribution
-telemetry; the proxy masks connecting IPs to a network prefix in its logs
-and stats, and links no address to any wallet. Set `PRIMO_DNS_FALLBACK=0`
-to disable the miner's public-resolver DNS fallback if you prefer; the fee
-still works via your platform resolver.
-
-Implemented in `src/dev_fee.cpp`; the fee and the donations below are the
-project's only funding, and forks are of course free to change it (GPL).
+Upstream PrimoLab's `primo-arm-miner` includes a small default dev fee —
+see their project (linked above) for details if you're curious how it
+works there. This is a GPL fork, and disabling it was a deliberate choice
+for this build.
 
 ## Validation
 
@@ -416,18 +379,6 @@ arrangements, and the terms of any pool you connect to. Double-check wallet
 addresses — shares mined to a mistyped address are unrecoverable.
 
 Use responsibly.
-
-## Donations
-
-If this miner earns you something and you'd like to support it, donations
-go directly toward acquiring ARMv9 test hardware (SVE2-capable boards and
-phones) so future optimization work can target the next generation of ARM
-cores the same way this release was tuned on real ARMv8 silicon:
-
-- **VRSC**: `RDArJkrPSKPhX8zwUJHLu2SJWrL4GwCgKz`
-- **XMR**: `42oukEEbeW8ippUDnUrexGS53QZ5gi28ELofq8KPgEoya1yghHACvNwbr9fJHGQWJUPz16cyJeFXcEexLuy7pBcdBzrzxvZ`
-- **LTC**: `ltc1qguj48xprktyeqm4dqrje5cr7f8g76e0mvrdjh6`
-- **BTC**: `15nR6PuUkjTyjv9dnkYd2GbjbgiMxs4dLi`
 
 ## Internals
 
