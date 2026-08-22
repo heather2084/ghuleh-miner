@@ -304,9 +304,10 @@ Takes effect the next time mining starts.
 
 ## Distribution
 
-Play Store bans mining → sideload / mirrors. Canonical downloads are
-https://primolab.dev/dl/ (forge-independent); GitLab first, GitHub when the
-org unflags, self-hosted F-Droid repo later for auto-updates. Full plan:
-/root/primolab-site/DISTRIBUTION.md (untracked). APK signing: release
-keystore is stable across versions — see the checklist item above.
+Historical entry, predates the fork — upstream's own plan for
+primolab.dev/dl/, GitLab/GitHub mirrors, and an untracked path on
+upstream's own machine. None of that is this fork's distribution path.
+This fork is sideloaded from a locally-built, locally-signed APK — see the
+root README and docs/DISTRIBUTION.md. APK signing: release keystore is
+stable across versions — see the checklist item above.
 ```
