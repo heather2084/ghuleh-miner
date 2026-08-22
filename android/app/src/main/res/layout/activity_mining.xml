@@ -165,7 +165,7 @@
                     <TextView style="@style/StatLabel" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="BATTERY" />
                 </LinearLayout>
 
-                <!-- Odd tile out (9 total in a 2-col grid) -- span both columns and
+                <!-- Odd tile out (9 total in a 2-col grid): span both columns and
                      center it instead of leaving it stranded in the left column
                      with a blank cell beside it. -->
                 <LinearLayout android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_columnSpan="2" android:layout_gravity="center_horizontal" android:layout_margin="4dp" android:orientation="vertical" android:background="@drawable/stat_tile" android:padding="12dp">
