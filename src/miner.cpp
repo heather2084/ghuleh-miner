@@ -20,6 +20,7 @@
 #include <time.h>
 #include <unistd.h>
 
+#include "civiclight_algo.h"
 #include "cpu_features.h"
 #include "dev_fee.h"
 #include "miner.h"
@@ -1085,6 +1086,10 @@ bool miner_init_algorithm_runtime(bool *algorithm_ready_out)
          * on mismatch (broken build / JIT / fast-math contamination). */
         algorithm_ready = randomx_init_runtime(opt_n_threads) != 0;
 #endif
+    } else if (opt_algo == ALGO_CIVICLIGHT) {
+        /* Runs the v1/v2 known-answer self-test internally; refuses to
+         * mine on mismatch. */
+        algorithm_ready = civiclight_init_runtime(opt_n_threads) != 0;
     } else {
         applog(LOG_ERR, "No init handler for algorithm %d", (int)opt_algo);
     }
@@ -1106,6 +1111,8 @@ void miner_cleanup_algorithm_runtime(bool algorithm_ready)
     if (opt_algo == ALGO_RANDOMX)
         randomx_cleanup_runtime();
 #endif
+    if (opt_algo == ALGO_CIVICLIGHT)
+        civiclight_cleanup_runtime();
 }
 
 void miner_get_api_snapshot(struct miner_api_snapshot *snapshot)
@@ -1262,6 +1269,8 @@ int scanhash_dispatch(int thr_id, struct work *work, uint32_t max_hashes, unsign
         case ALGO_RANDOMX:
             return scanhash_randomx(thr_id, work, max_hashes, hashes_done);
 #endif
+        case ALGO_CIVICLIGHT:
+            return scanhash_civic(thr_id, work, max_hashes, hashes_done);
         default:
             applog(LOG_ERR, "Unsupported algorithm id %d in scanhash_dispatch", (int)opt_algo);
             miner_request_abort();

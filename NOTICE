@@ -33,3 +33,14 @@ Copyright (c) tevador and The Monero Project) is vendored unmodified;
 its LICENSE file must be preserved in redistribution (text also
 retained at LICENSES/BSD-3-Clause-RandomX.txt so binary packages
 that ship the LICENSES/ directory satisfy this).
+
+The yespower proof-of-work library (third_party/yespower/, BSD 2-Clause,
+Copyright 2009 Colin Percival, Copyright 2013-2018 Alexander Peslyak) is
+vendored unmodified from https://github.com/openwall/yespower; its LICENSE
+file must be preserved in redistribution (text also retained at
+LICENSES/BSD-2-Clause-yespower.txt). It is used by src/algorithm/civiclight.cpp
+(the CIVIC/CivicNet "civiclight" algorithm), which is this project's own
+clean-room implementation of that algorithm's combination logic, written
+from a plain-language description rather than derived from CivicLight's
+own source (their repos carry no license, so their code isn't cleared for
+reuse here).

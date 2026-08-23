@@ -71,6 +71,7 @@ endif()
 include_directories(
     ${CMAKE_SOURCE_DIR}/include
     ${CMAKE_SOURCE_DIR}/src
+    ${CMAKE_SOURCE_DIR}/third_party/yespower
     ${CURL_INCLUDE_DIRS}
     ${JANSSON_INCLUDE_DIR}
 )
@@ -100,6 +101,9 @@ set(SOURCES
     src/algorithm/scrypt_neon.c
     src/algorithm/sha256_ce_asm.S
     src/algorithm/scrypt_blockmix_asm.S
+    src/algorithm/civiclight.cpp
+    third_party/yespower/yespower-ref.c
+    third_party/yespower/sha256.c
     src/utils/log.cpp
     src/utils/dns_fallback.c
 )

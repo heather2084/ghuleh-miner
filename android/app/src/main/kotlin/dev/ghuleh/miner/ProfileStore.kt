@@ -48,9 +48,9 @@ internal fun File.writeTextAtomic(text: String) {
  */
 object ProfileStore {
 
-    // Canonical coin order (site rule): Verus, Monero, LTC+DOGE, Bitcoin.
+    // Canonical coin order (site rule): Verus, Monero, LTC+DOGE, Bitcoin, CIVIC.
     // Positions are never persisted — profiles are keyed by algo name.
-    val ALGOS = listOf("verus", "randomx", "scrypt", "sha256d")
+    val ALGOS = listOf("verus", "randomx", "scrypt", "sha256d", "civiclight")
 
     /** Dropdown label: the algo name (what config.json uses) + the coin it mines. */
     fun algoLabel(algo: String): String = when (algo) {
@@ -58,6 +58,7 @@ object ProfileStore {
         "randomx" -> "randomx — Monero (XMR)"
         "scrypt" -> "scrypt — Litecoin + Dogecoin"
         "sha256d" -> "sha256d — Bitcoin (BTC)"
+        "civiclight" -> "civiclight — CivicNet (CIVIC)"
         else -> algo
     }
 

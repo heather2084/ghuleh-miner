@@ -250,6 +250,11 @@ static void *benchmark_thread(void *userdata)
         switch (opt_algo) {
         case ALGO_RANDOMX: batch_size = 500;    break;  /* ~10-200 H/s/thread */
         case ALGO_SCRYPT:  batch_size = 10000;  break;  /* ~2-5 kH/s/thread */
+        /* civiclight v2 (post-activation) runs the same memory-hard N=2048,
+         * r=8 yespower cost as scrypt-class algorithms, likely similar
+         * kH/s/thread order of magnitude -- reuse scrypt's batch size until
+         * real on-device throughput is measured and this can be tuned. */
+        case ALGO_CIVICLIGHT: batch_size = 10000; break;
         default:           batch_size = 500000; break;  /* verus/sha256d: MH/s */
         }
         scanhash_dispatch(thr_id, &work, batch_size, &hashes_done);

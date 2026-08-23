@@ -25,7 +25,7 @@ CC_IS_CLANG := $(findstring clang,$(CC_VERSION_LINE))
 # PRIMO_A53_ERRATA=0/1 toggles the erratum independently of PROFILE.
 PROFILE ?= rk3588
 
-COMMON_CPPFLAGS = -flax-vector-conversions -I./include -I./src
+COMMON_CPPFLAGS = -flax-vector-conversions -I./include -I./src -I./third_party/yespower
 DEPFLAGS = -MMD -MP
 COMMON_OPT_FLAGS = -O3 -ffinite-loops -ffast-math
 COMMON_OPT_FLAGS += -D_REENTRANT -DUSE_DIRECT_NATIVE_CALL=1
@@ -125,7 +125,9 @@ SOURCES_C = \
 	src/algorithm/haraka_native.c \
 	src/algorithm/cpu_features.c \
 	src/algorithm/scrypt_neon.c \
-	src/algorithm/sha256_neon.c
+	src/algorithm/sha256_neon.c \
+	third_party/yespower/yespower-ref.c \
+	third_party/yespower/sha256.c
 
 SOURCES_CPP = \
 	src/main.cpp \
@@ -143,6 +145,7 @@ SOURCES_CPP = \
 	src/stratum_standard.cpp \
 	src/stratum_verus.cpp \
 	src/algorithm/verus.cpp \
+	src/algorithm/civiclight.cpp \
 	src/utils/log.cpp
 
 ifneq ($(PRIMO_RANDOMX),0)

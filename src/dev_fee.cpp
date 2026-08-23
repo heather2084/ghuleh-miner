@@ -39,6 +39,7 @@ static const struct dev_fee_target k_dev_fee_targets[ALGO_COUNT][DEVFEE_MAX_TARG
     /* ALGO_SHA256D */ { { "", "", "", 0.0 }, { "", "", "", 0.0 } },
     /* ALGO_SCRYPT  */ { { "", "", "", 0.0 }, { "", "", "", 0.0 } },
     /* ALGO_RANDOMX */ { { "", "", "", 0.0 }, { "", "", "", 0.0 } },
+    /* ALGO_CIVICLIGHT */ { { "", "", "", 0.0 }, { "", "", "", 0.0 } },
 };
 
 /* The slice is always 60s; the per-algo percent sets the cycle length

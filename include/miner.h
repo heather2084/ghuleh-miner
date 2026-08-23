@@ -454,6 +454,7 @@ typedef enum {
     ALGO_SHA256D,    // Bitcoin
     ALGO_SCRYPT,     // Litecoin
     ALGO_RANDOMX,    // Monero (rx/0)
+    ALGO_CIVICLIGHT, // CIVIC (CivicNet) -- see civiclight_algo.h
     ALGO_COUNT
 } algo_t;
 

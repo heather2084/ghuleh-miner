@@ -103,6 +103,27 @@ project), the TLS transport and WebSocket handshake code, `android/`,
     redistribution. BSD-3 is compatible with this project's GPL-3.0-or-later
     distribution.
 
+- `third_party/yespower/`
+  - Vendored copy of the yespower reference implementation
+    (https://github.com/openwall/yespower) at upstream commit
+    `1977c283bc43eed5a2c2579e02d6d996e49866b0` (2026-06-15): `yespower.h`,
+    `yespower-ref.c`, `sha256.c`/`sha256.h`, `sysendian.h`,
+    `insecure_memzero.h`, used unmodified.
+  - BSD 2-Clause license (Copyright 2009 Colin Percival, Copyright
+    2013-2018 Alexander Peslyak); the license text is retained at
+    `third_party/yespower/LICENSE` and `LICENSES/BSD-2-Clause-yespower.txt`
+    and must be preserved in redistribution. BSD-2 is compatible with this
+    project's GPL-3.0-or-later distribution.
+  - `src/algorithm/civiclight.cpp` (the CIVIC/CivicNet "civiclight"
+    algorithm's combination logic -- SHA256d, then either XOR+SHA256 or
+    yespower+XOR+SHA256 depending on block time) is this project's own
+    clean-room implementation, written from a plain-language description
+    of the algorithm rather than from CivicLight's own source. CivicLight's
+    repos (github.com/CivicLight/civicnet-easyminer-android and
+    civiclight-miner-windows) carry no LICENSE file as of 2026-08, so their
+    code is not cleared for reuse here regardless of claims made elsewhere
+    on their project site.
+
 ## Compliance note
 
 The ccminer-ancestry files listed above were substantially rewritten, but
