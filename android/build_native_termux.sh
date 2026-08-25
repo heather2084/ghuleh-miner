@@ -59,7 +59,7 @@ make -j"$(nproc)" $RANDOMX_MAKEVARS \
   PRIMO_EXTRA_CXXFLAGS="-I$SDEPS/include -DCURL_STATICLIB" \
   || echo "==> make exited nonzero (OK if only the throwaway link failed) — verifying objects"
 missing=0
-for s in src/*.cpp src/utils/*.cpp src/algorithm/*.c src/algorithm/*.S; do
+for s in src/*.cpp src/utils/*.cpp src/algorithm/*.c src/algorithm/*.S third_party/yespower/*.c; do
   [ -e "$s" ] || continue
   # stratum_xmr / randomx_algo aren't compiled when PRIMO_RANDOMX=0.
   if [ "$PRIMO_RANDOMX" = "0" ]; then
@@ -84,7 +84,7 @@ echo "==> relinking static"
 #    suppress the implicit one; we bundle that exact lib next to the binary.
 #    mbedTLS archives follow libcurl (link order matters for static archives:
 #    curl pulls tls -> x509 -> crypto).
-"$W/clang++" $(ls src/*.o src/utils/*.o src/algorithm/*.o) \
+"$W/clang++" $(ls src/*.o src/utils/*.o src/algorithm/*.o third_party/yespower/*.o) \
   -flto -pthread -fuse-ld=lld -nostdlib++ \
   "$SDEPS/lib/libcurl.a" \
   "$SDEPS/lib/libmbedtls.a" "$SDEPS/lib/libmbedx509.a" "$SDEPS/lib/libmbedcrypto.a" \
