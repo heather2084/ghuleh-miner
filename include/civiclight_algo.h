@@ -1,21 +1,25 @@
 /*
- * CIVIC (CivicNet) "civiclight" algorithm — clean-room implementation.
+ * CIVIC (CivicNet) "civiclight" algorithm.
  * Copyright 2026 primo-arm-miner contributors (Ghuleh Miner additions).
  *
- * civiclight is a two-version PoW: both versions start with SHA256d(header).
- * Version 1 (pre-activation) XORs the result with a constant byte and hashes
- * once more with SHA256. Version 2 (activation timestamp onward) instead
- * runs the SHA256d result through yespower (N=2048, r=8), XORs that output
- * against the SHA256d result, and finishes with one more SHA256. Which
- * version applies is decided by the block's nTime field.
+ * civiclight is a two-version PoW: both versions start with SHA256d(header),
+ * then one more plain SHA256 of that result ("hash1"). Version 1
+ * (pre-activation) XORs hash1 with a constant byte and hashes once more with
+ * SHA256. Version 2 (activation timestamp onward) instead runs hash1 through
+ * yespower (N=2048, r=8), XORs that output against hash1, and finishes with
+ * one more SHA256. Which version applies is decided by the block's nTime
+ * field.
  *
- * This header/implementation was written from a plain-language description
- * of the algorithm's steps, not copied from any CivicLight source (their
- * repos carry no license file, so their code isn't cleared for reuse here).
- * The proof-of-work-heavy part, yespower itself, comes instead from its
- * original authors' own BSD-2 licensed reference implementation, vendored
- * unmodified at third_party/yespower/ — see third_party/yespower/LICENSE
- * and NOTICE.
+ * The combination logic (the extra hash1 round in particular) was corrected
+ * against CivicLight's own published open-source CPU miner --
+ * github.com/CivicLight/civiclight-miner-windows,
+ * cpuminer-opt-source/algo/civiclight/civiclight.c -- explicitly stated as
+ * open source at civiclight.xyz/faq.html. See src/algorithm/civiclight.cpp
+ * for the fuller provenance note and how this was verified against a real
+ * solved CivicNet block. The proof-of-work-heavy part, yespower itself,
+ * comes from its original authors' own BSD-2 licensed reference
+ * implementation, vendored unmodified at third_party/yespower/ — see
+ * third_party/yespower/LICENSE and NOTICE.
  */
 #ifndef CIVICLIGHT_ALGO_H
 #define CIVICLIGHT_ALGO_H
