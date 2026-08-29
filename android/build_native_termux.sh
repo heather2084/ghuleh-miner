@@ -59,7 +59,14 @@ make -j"$(nproc)" $RANDOMX_MAKEVARS \
   PRIMO_EXTRA_CXXFLAGS="-I$SDEPS/include -DCURL_STATICLIB" \
   || echo "==> make exited nonzero (OK if only the throwaway link failed) — verifying objects"
 missing=0
-for s in src/*.cpp src/utils/*.cpp src/algorithm/*.c src/algorithm/*.S third_party/yespower/*.c; do
+# NOTE: third_party/yespower/ is NOT globbed wildcard-style on purpose.
+# yespower-ref.c is the old (now-unused) implementation, kept only for
+# reference/comparison and no longer in the Makefile's SOURCES_C, so it
+# never produces a .o -- a wildcard here would wrongly flag that as a
+# compile failure. yespower-platform.c is `#include`d directly by
+# yespower-opt.c (not its own translation unit) and never produces a .o
+# either. Only list files the Makefile actually compiles.
+for s in src/*.cpp src/utils/*.cpp src/algorithm/*.c src/algorithm/*.S third_party/yespower/yespower-opt.c third_party/yespower/sha256.c; do
   [ -e "$s" ] || continue
   # stratum_xmr / randomx_algo aren't compiled when PRIMO_RANDOMX=0.
   if [ "$PRIMO_RANDOMX" = "0" ]; then

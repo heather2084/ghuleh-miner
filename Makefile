@@ -126,7 +126,7 @@ SOURCES_C = \
 	src/algorithm/cpu_features.c \
 	src/algorithm/scrypt_neon.c \
 	src/algorithm/sha256_neon.c \
-	third_party/yespower/yespower-ref.c \
+	third_party/yespower/yespower-opt.c \
 	third_party/yespower/sha256.c
 
 SOURCES_CPP = \

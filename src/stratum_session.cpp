@@ -524,6 +524,16 @@ void stratum_init_context(struct stratum_ctx *sctx, int pooln, bool is_verus_pro
     stratum_thread_active_store(sctx, 0);
     memset(sctx->pending_submits, 0, sizeof(sctx->pending_submits));
     pthread_mutex_init(&sctx->submit_lock, NULL);
+
+    // stratum_reset_session_runtime() and stratum_store_session_id() both
+    // default next_diff to 1.0, but neither runs on the very first connect
+    // of a fresh context -- only on reconnects (stratum_disconnect) and on
+    // pools that send a session_id in their subscribe response. Without
+    // this, a pool that skips the session_id and is slow to send its first
+    // mining.set_difficulty leaves next_diff at its zero-initialized 0.0,
+    // which shows up as "New work: ... diff 0.000" and computes a
+    // degenerate (near-maximal) target via diff_to_target(0.0).
+    sctx->next_diff = 1.0;
 }
 
 void stratum_destroy_context(struct stratum_ctx *sctx)

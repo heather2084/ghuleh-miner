@@ -109,11 +109,17 @@ void stratum_publish_work(const struct work *new_work, bool clean)
     pthread_mutex_unlock(&stratum_work_lock);
 
     if (!opt_quiet && log_new_work) {
+        // %.3f rounds anything under 0.0005 down to a display of "0.000",
+        // which is indistinguishable from a genuine 0.0 -- and those mean
+        // very different things for diff_to_target() (a tiny-but-nonzero
+        // diff still yields a real, hard target; a true 0.0 or a rounding
+        // artifact both saturate to the degenerate near-maximal target).
+        // %g shows real precision so this stops being ambiguous.
         if (work_height > 0)
-            applog(LOG_INFO, "New work: block %u, job %s, diff %.3f",
+            applog(LOG_INFO, "New work: block %u, job %s, diff %g",
                    work_height, job_id_copy, work_diff);
         else
-            applog(LOG_INFO, "New work: job %s, diff %.3f", job_id_copy, work_diff);
+            applog(LOG_INFO, "New work: job %s, diff %g", job_id_copy, work_diff);
     }
 }
 

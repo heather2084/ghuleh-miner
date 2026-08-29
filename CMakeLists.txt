@@ -102,7 +102,7 @@ set(SOURCES
     src/algorithm/sha256_ce_asm.S
     src/algorithm/scrypt_blockmix_asm.S
     src/algorithm/civiclight.cpp
-    third_party/yespower/yespower-ref.c
+    third_party/yespower/yespower-opt.c
     third_party/yespower/sha256.c
     src/utils/log.cpp
     src/utils/dns_fallback.c
