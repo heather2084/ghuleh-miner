@@ -176,15 +176,31 @@ int scanhash_civic(int thr_id, struct work *work, uint32_t max_hashes,
 
     work->valid_nonces = 0;
 
-    // Same stratum-word-order convention as scanhash_sha256d: version +
-    // prevhash + nTime/nBits/nonce are byte-swapped back to real header
-    // bytes; the merkle root (words 9-16) is already correctly ordered.
-    for (int i = 0; i < 9; i++)
-        be32enc(header + i * 4, pdata[i]);
-    for (int i = 9; i < 17; i++)
+    // build_standard_work() (src/stratum_standard.cpp) populates every word
+    // of pdata[0..18] uniformly via le32dec() of the raw job/header bytes
+    // (version, prevhash, merkle root, nTime, nBits all go through
+    // le32dec -- see build_standard_work()'s new_work->data[...] = le32dec(...)
+    // assignments). le32dec/le32enc are exact inverses, so reconstructing the
+    // true 80-byte header here requires le32enc on *every* word, not just
+    // the merkle-root words.
+    //
+    // This function used to copy scanhash_sha256d's be32enc-for-most-words
+    // pattern (see git history), on the assumption it was "the real header
+    // byte order" convention shared across algorithms. It isn't: that
+    // pattern exists because scanhash_sha256d's own optimized SHA256 routine
+    // wants its input pre-arranged for its internal hot loop, not because
+    // it's the literal serialized header. civiclight_hash() calls a plain
+    // generic SHA256_Buf() with no such compensating internal swap, so it
+    // needs the literal, standard little-endian header bytes -- confirmed
+    // by reconstructing a real solved CivicNet block's header this same way
+    // and finding be32enc-for-those-words produced a completely different
+    // (wrong) header than the real one, while all-le32enc matched exactly.
+    // This was the actual reason every share came back "Low difficulty
+    // share" even after fixing the hash-combination logic itself: we were
+    // hashing the wrong bytes.
+    for (int i = 0; i < 19; i++)
         le32enc(header + i * 4, pdata[i]);
-    for (int i = 17; i < 20; i++)
-        be32enc(header + i * 4, pdata[i]);
+    le32enc(header + 76, pdata[19]);
 
     nTime = pdata[17];
 
@@ -192,7 +208,7 @@ int scanhash_civic(int thr_id, struct work *work, uint32_t max_hashes,
     while (remaining > 0 &&
            !miner_work_restart_requested(work->restart_generation) &&
            !miner_should_abort()) {
-        be32enc(header + 76, n);
+        le32enc(header + 76, n);
 
         uint8_t hash[32];
         civiclight_hash(header, nTime, hash);
