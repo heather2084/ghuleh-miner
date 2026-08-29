@@ -176,39 +176,46 @@ int scanhash_civic(int thr_id, struct work *work, uint32_t max_hashes,
 
     work->valid_nonces = 0;
 
-    // build_standard_work() (src/stratum_standard.cpp) populates every word
-    // of pdata[0..18] uniformly via le32dec() of the raw job/header bytes
-    // (version, prevhash, merkle root, nTime, nBits all go through
-    // le32dec -- see build_standard_work()'s new_work->data[...] = le32dec(...)
-    // assignments). le32dec/le32enc are exact inverses, so reconstructing the
-    // true 80-byte header here requires le32enc on *every* word, not just
-    // the merkle-root words.
-    //
-    // This function used to copy scanhash_sha256d's be32enc-for-most-words
-    // pattern (see git history), on the assumption it was "the real header
-    // byte order" convention shared across algorithms. It isn't: that
-    // pattern exists because scanhash_sha256d's own optimized SHA256 routine
-    // wants its input pre-arranged for its internal hot loop, not because
-    // it's the literal serialized header. civiclight_hash() calls a plain
-    // generic SHA256_Buf() with no such compensating internal swap, so it
-    // needs the literal, standard little-endian header bytes -- confirmed
-    // by reconstructing a real solved CivicNet block's header this same way
-    // and finding be32enc-for-those-words produced a completely different
-    // (wrong) header than the real one, while all-le32enc matched exactly.
-    // This was the actual reason every share came back "Low difficulty
-    // share" even after fixing the hash-combination logic itself: we were
-    // hashing the wrong bytes.
-    for (int i = 0; i < 19; i++)
+    // REVERTED (see git history): an earlier version of this function used
+    // le32enc uniformly for every word, on the theory that build_standard_work()
+    // populates pdata[0..18] via le32dec() of the raw job bytes, so le32enc
+    // undoes that exactly. That reasoning was checked against a real solved
+    // CivicNet block's header fields taken from a block explorer -- but a
+    // block explorer's raw header bytes aren't stratum wire data, and that
+    // "verification" never actually exercised real pool-sent job bytes.
+    // Deployed and tested live against us.nitropool.net, the le32enc-uniform
+    // version rejected 100% of shares as "Low difficulty share", and direct
+    // inspection of real live nTime/nBits wire values confirmed why: e.g. a
+    // live nTime of 0x6a923457 only decodes to a plausible current Unix
+    // timestamp when read big-endian (le32dec gives a nonsense 2016 date).
+    // The pool's stratum server sends version/prevhash/nTime/nBits/nonce
+    // byte-swapped per word relative to real header bytes -- exactly the
+    // same convention scanhash_sha256d() already handles correctly for its
+    // algorithm against this same pool family (see its comment). The merkle
+    // root (words 9-16) is the one exception: it's computed locally by
+    // build_merkle_root(), not pool wire data, so it's already in correct
+    // header byte order and needs no swap.
+    for (int i = 0; i < 9; i++)
+        be32enc(header + i * 4, pdata[i]);
+    for (int i = 9; i < 17; i++)
         le32enc(header + i * 4, pdata[i]);
-    le32enc(header + 76, pdata[19]);
+    for (int i = 17; i < 20; i++)
+        be32enc(header + i * 4, pdata[i]);
 
-    nTime = pdata[17];
+    // nTime for the v1/v2 activation-time check must match the same wire
+    // interpretation as the header bytes we just built, not the raw
+    // pdata[17] (= le32dec(wire_bytes), the wrong way round -- decoded a
+    // live wire value of 0x6a923457 to an implausible 2016 timestamp).
+    // header+68 now holds be32enc(pdata[17]), i.e. wire_bytes reversed, so
+    // le32dec(header+68) recovers be32dec(wire_bytes) -- the correct,
+    // plausible-current-timestamp interpretation.
+    nTime = le32dec(header + 68);
 
     uint32_t remaining = max_hashes;
     while (remaining > 0 &&
            !miner_work_restart_requested(work->restart_generation) &&
            !miner_should_abort()) {
-        le32enc(header + 76, n);
+        be32enc(header + 76, n);
 
         uint8_t hash[32];
         civiclight_hash(header, nTime, hash);
