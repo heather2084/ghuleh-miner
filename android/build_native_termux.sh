@@ -91,7 +91,14 @@ echo "==> relinking static"
 #    suppress the implicit one; we bundle that exact lib next to the binary.
 #    mbedTLS archives follow libcurl (link order matters for static archives:
 #    curl pulls tls -> x509 -> crypto).
-"$W/clang++" $(ls src/*.o src/utils/*.o src/algorithm/*.o third_party/yespower/*.o) \
+#    third_party/yespower/*.o is NOT globbed here either (see the matching
+#    note on the verification loop above): a stale yespower-ref.o left over
+#    from a build made before the yespower-opt switch would otherwise get
+#    swept in here too, alongside the current yespower-opt.o, and both
+#    define yespower()/yespower_tls()/etc. -> "duplicate symbol" at link
+#    time. List only the two object files the current Makefile compiles.
+"$W/clang++" $(ls src/*.o src/utils/*.o src/algorithm/*.o) \
+  third_party/yespower/yespower-opt.o third_party/yespower/sha256.o \
   -flto -pthread -fuse-ld=lld -nostdlib++ \
   "$SDEPS/lib/libcurl.a" \
   "$SDEPS/lib/libmbedtls.a" "$SDEPS/lib/libmbedx509.a" "$SDEPS/lib/libmbedcrypto.a" \
