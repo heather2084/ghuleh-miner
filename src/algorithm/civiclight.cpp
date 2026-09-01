@@ -48,7 +48,13 @@ static void sha256d(const uint8_t *in, size_t len, uint8_t out[32])
     SHA256_Buf(round1, 32, out);
 }
 
-void civiclight_hash(const uint8_t header[80], uint32_t nTime, uint8_t out[32])
+// Shared implementation: both civiclight_hash() (self-test / cold-path
+// callers) and civiclight_hash_with_local() (the hot mining loop, see
+// scanhash_civic below) funnel through here. `local` is only touched by the
+// v2/yespower branch -- the v1 branch returns before it would be used, so
+// callers on the v1-only path may pass a not-yet-initialized local safely.
+static void civiclight_hash_impl(const uint8_t header[80], uint32_t nTime, uint8_t out[32],
+                                  yespower_local_t *local)
 {
     uint8_t intermediate[32];
     sha256d(header, 80, intermediate);
@@ -77,10 +83,8 @@ void civiclight_hash(const uint8_t header[80], uint32_t nTime, uint8_t out[32])
     }
 
     // v2: yespower(hash1, N=2048, r=8), XOR against hash1, then one more
-    // SHA256.
-    yespower_local_t local;
-    yespower_init_local(&local);
-
+    // SHA256. `local` is the caller's scratch buffer -- see the two wrapper
+    // functions below for who owns/allocates it and why that split exists.
     yespower_params_t params;
     params.version = YESPOWER_1_0;
     params.N = CIVICLIGHT_YESPOWER_N;
@@ -89,13 +93,49 @@ void civiclight_hash(const uint8_t header[80], uint32_t nTime, uint8_t out[32])
     params.perslen = 0;
 
     yespower_binary_t yhash;
-    yespower(&local, hash1, 32, &params, &yhash);
-    yespower_free_local(&local);
+    yespower(local, hash1, 32, &params, &yhash);
 
     uint8_t xored[32];
     for (int i = 0; i < 32; i++)
         xored[i] = yhash.uc[i] ^ hash1[i];
     SHA256_Buf(xored, 32, out);
+}
+
+void civiclight_hash(const uint8_t header[80], uint32_t nTime, uint8_t out[32])
+{
+    // Cold-path wrapper: the startup self-test (civiclight_init_runtime)
+    // calls this a total of twice, so allocating and freeing yespower's
+    // scratch buffer here is fine. The per-nonce mining loop must NOT go
+    // through this function -- see civiclight_hash_with_local() below.
+    yespower_local_t local;
+    yespower_init_local(&local);
+    civiclight_hash_impl(header, nTime, out, &local);
+    yespower_free_local(&local);
+}
+
+// Hot-path variant for scanhash_civic(): takes an already-initialized
+// yespower local buffer instead of allocating one internally.
+//
+// yespower_init_local()/yespower_free_local() allocate and release
+// yespower's scratch buffer, which for this coin's fixed parameters
+// (N=2048, r=8) is ~128*N*r = 2 MiB (see RFC 7914 / the yespower reference
+// implementation for that sizing formula). civiclight_hash() used to be the
+// ONLY hash entry point, called once per nonce from the scanhash_civic loop
+// below -- meaning every single hash attempt did a fresh 2 MiB malloc and
+// free before/after the actual (comparatively cheap) yespower computation.
+// That made heap allocation overhead the dominant per-hash cost instead of
+// the PoW work itself, throttling real throughput far below what the
+// hardware -- and the hashrate this app displays, which is measured off the
+// same loop -- would suggest. yespower's own reference implementation
+// allocates the local buffer once per thread and reuses it across many
+// hashes; scanhash_civic now does the same, allocating once per batch
+// (still far more often than the ideal "once per mining thread," but a
+// batch is typically millions of nonces, so this removes effectively all of
+// the waste) and passing it in here instead.
+static void civiclight_hash_with_local(const uint8_t header[80], uint32_t nTime, uint8_t out[32],
+                                       yespower_local_t *local)
+{
+    civiclight_hash_impl(header, nTime, out, local);
 }
 
 // ---------------------------------------------------------------------
@@ -211,6 +251,14 @@ int scanhash_civic(int thr_id, struct work *work, uint32_t max_hashes,
     // plausible-current-timestamp interpretation.
     nTime = le32dec(header + 68);
 
+    // Allocate yespower's scratch buffer ONCE for this whole batch instead
+    // of once per nonce -- see the comment on civiclight_hash_with_local()
+    // above for why the old per-nonce allocation (via civiclight_hash())
+    // was silently throttling real throughput on every device mining v2
+    // (i.e. all of them, since v2 activated back in May 2026).
+    yespower_local_t local;
+    yespower_init_local(&local);
+
     uint32_t remaining = max_hashes;
     while (remaining > 0 &&
            !miner_work_restart_requested(work->restart_generation) &&
@@ -218,7 +266,7 @@ int scanhash_civic(int thr_id, struct work *work, uint32_t max_hashes,
         be32enc(header + 76, n);
 
         uint8_t hash[32];
-        civiclight_hash(header, nTime, hash);
+        civiclight_hash_with_local(header, nTime, hash, &local);
 
         // hash[] is a standard big-endian SHA256 digest (word i's bytes at
         // hash[i*4..i*4+3], big-endian). hash_le_target wants each word
@@ -242,6 +290,8 @@ int scanhash_civic(int thr_id, struct work *work, uint32_t max_hashes,
         n++;
         remaining--;
     }
+
+    yespower_free_local(&local);
 
     *hashes_done = n - first_nonce;
     pdata[19] = n;
