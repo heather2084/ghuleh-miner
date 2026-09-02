@@ -1283,13 +1283,29 @@ static bool submit_ready_share(struct work *work)
     struct pool_infos *pool = &pools[work->pooln];
     struct stratum_ctx *sctx = &pool->stratum;
 
-    // A reconnect or failover invalidates the work generation before fresh work arrives.
-    // Never submit shares from a stale generation, even if the pool has re-authenticated.
-    if (miner_work_restart_requested(work->restart_generation)) {
-        if (opt_debug)
-            applog(LOG_DEBUG, "Dropping stale share from expired work generation");
-        return false;
-    }
+    // FIX (2026-09-02): this used to drop the share right here whenever the
+    // work generation counter had ticked forward at all since this share's
+    // batch started scanning -- but that counter bumps on EVERY restart-
+    // worthy job (routine new blocks included, not just reconnects/
+    // failovers), and on this coin's pool blocks land every 15-90s. That
+    // made this function throw away the large majority of legitimately
+    // found shares before they ever reached the pool, well before the pool
+    // itself got any say -- measured on live traffic as ~1 accepted share
+    // per ~17 min here vs. CivicLight's own reference miner (EasyMiner)
+    // landing ~1 every ~14s at a similar hashrate against the same pool.
+    // A share found against a specific job_id is still exactly as valid as
+    // it was the moment it was found, regardless of what job showed up
+    // after -- the pool keeps a window of recent job_ids for exactly this
+    // reason and is the right place to decide accept vs. reject, not a
+    // local generation counter whose real job is telling the SCAN LOOP when
+    // to stop hashing against outdated work (see civiclight.cpp and the
+    // other algorithms' scan loops, which still check it correctly for
+    // that). The stratum_is_authenticated() check just below still catches
+    // the genuine reconnect/failover case this comment used to describe --
+    // a share left over from right before a reconnect will very often still
+    // land inside that not-yet-authenticated window and get skipped here;
+    // if it doesn't, the pool will simply reply "Rejected" for it like any
+    // other stale submission, which is the normal, harmless outcome.
 
     // Don't submit if not authenticated
     if (!stratum_is_authenticated(sctx)) {
