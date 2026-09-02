@@ -219,6 +219,11 @@ class MinerService : Service() {
         val out = File(filesDir, "config.runtime.json")
         try {
             val json = JSONObject(src.readText())
+            // TEMP DIAGNOSTIC (2026-09-02): force debug logging on so a share
+            // silently dropped as stale (submit_ready_share() in miner.cpp)
+            // actually prints why, instead of vanishing with no trace. Remove
+            // once the HMDVibe-09 zero-accepted mystery is root-caused.
+            json.put("debug", true)
             if (json.has("url")) json.put("url", resolveUrl(json.optString("url")))
             // Failover pools each carry their own url; resolve them all so a
             // mid-session pool switch doesn't hit the getaddrinfo sandbox wall.
