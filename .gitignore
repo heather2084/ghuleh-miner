@@ -29,3 +29,7 @@ keystore.properties
 /.vscode/
 /Makefile.termux-orig
 /.clang16-wrappers/
+
+# Per-machine fleet-push run state (which devices already got the current
+# APK) -- not shared/portable across machines, regenerated locally.
+/android/push_state_installed.txt
